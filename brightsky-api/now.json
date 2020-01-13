@@ -1,0 +1,25 @@
+{
+  "builds": [{ "src": "index.js", "use": "@now/node-server" }],
+  "routes": [
+    {
+      "src": "/current",
+      "dest": "/index.js",
+      "methods": ["GET"]
+    },
+    {
+      "src": "/forecast",
+      "dest": "/index.js",
+      "methods": ["GET"]
+    },
+    {
+      "src": "/current/",
+      "dest": "/index.js",
+      "methods": ["GET"]
+    },
+    {
+      "src": "/forecast/",
+      "dest": "/index.js",
+      "methods": ["GET"]
+    }
+  ]
+}
