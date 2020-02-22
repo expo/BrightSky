@@ -1,13 +1,14 @@
 const express = require("express");
-const app = express();
-const port = 3000;
 const fetch = require("node-fetch");
 const cors = require("cors");
+const app = express();
+const port = 3000;
 
 app.use(cors());
 
 // Generate your own API Key from https://darksky.net/dev
 const API_KEY = "378a09428c0dd21b3961956441c89314";
+
 function checkQueryVariables(query, res) {
   const { latitude, longitude } = query;
   if (!latitude || !longitude)

@@ -28,11 +28,9 @@ Expo builds apps fast.
 
 This demo will show you how to write a universal app - a single codebase that runs on iOS, Android, and Web. We can do this without downloading any new programs by using our web editor: [snack.expo.io](http://snack.expo.io).
 
-For reference here is the completed project: [https://github.com/expo/BrightSky/](https://github.com/expo/BrightSky/)
-
 ### Introducing Expo's web editor - Snack
 
-Start Here: [https://snack.expo.io/@fiberjw/a31e4f](https://snack.expo.io/@fiberjw/a31e4f)
+Start Here: [https://snack.expo.io/@fiberjw/0d18d0](https://snack.expo.io/@fiberjw/0d18d0)
 
 First we add a minimal static template. Notice that our app is instantly rendered. Since `Web` renders the fastest, it is the default when working, but you can click on `iOS` or `Android` tab at any time to see your app on a virtual phone or download the Expo Client on your mobile device for the fastest native development experience possible.
 
@@ -212,7 +210,7 @@ We stitch the screens together with `createBottomTabNavigator`
 
 Not so bad!
 Let's add a bit more style to this by getting a header with `createStackNavigator`:
-[https://snack.expo.io/@fiberjw/brightsky-pt.-3](https://snack.expo.io/@fiberjw/brightsky-pt.-3)
+[https://snack.expo.io/@fiberjw/brightsky-pt.-4](https://snack.expo.io/@fiberjw/brightsky-pt.-4)
 You are probably thinking, that's a decent amount of code for a header. But `createStackNavigator` allows us to do more, we will be using it later to `link` to different screens instead of using the somewhat constrained bottom navigator.
 
 ### Linking to another screen
