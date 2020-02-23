@@ -22,26 +22,27 @@ BrightSky
 
 </div>
 
-## Overview
+## Tutorial
 
-Expo builds apps fast.
+This demo will show you how to write a universal app with a single codebase that
+runs on iOS, Android, and Web using Expo. We can do this without downloading any new
+programs by using our web editor: [snack.expo.io](http://snack.expo.io).
 
-This demo will show you how to write a universal app - a single codebase that runs on iOS, Android, and Web. We can do this without downloading any new programs by using our web editor: [snack.expo.io](http://snack.expo.io).
+You can follow along by typing/copying code from each successive Snack into your
+original snack or by reading through the Snacks that we link as we explain it.
 
-### Introducing Expo's web editor - Snack
+### Introducing Expo's Web Editor - Snack
 
-Start Here: [https://snack.expo.io/@fiberjw/0d18d0](https://snack.expo.io/@fiberjw/0d18d0)
+⭐️ **Start here**: https://snack.expo.io/@fiberjw/3d7120
 
-First we add a minimal static template. Notice that our app is instantly rendered. Since `Web` renders the fastest, it is the default when working, but you can click on `iOS` or `Android` tab at any time to see your app on a virtual phone or download the Expo Client on your mobile device for the fastest native development experience possible.
+To start off, we added a minimal static template to this Snack project. Notice that our app is instantly rendered. Since `Web` renders the fastest in Snack, it is the default when working, but you can click on `iOS` or `Android` tab at any time to see your app on a virtual phone or download the Expo Client on your mobile device for the fastest native development experience possible.
 
-Be sure to save your snack to your profile before putting any significant work into it.
+### Talking to a Third-party API with React Hooks
 
-### React hooks, and talking to a 3rd party api.
+Source: https://snack.expo.io/@fiberjw/brightsky-pt.1
 
-Source: [https://snack.expo.io/@fiberjw/brightsky-pt.1](https://snack.expo.io/@fiberjw/brightsky-pt.1)
-
-We use react hooks to make our app dynamic. There is a lot of stuff written
-about hooks online, but for this snack we are going to only use the two most
+We use [React Hooks](https://reactjs.org/docs/hooks-overview.html) to make our app dynamic. There is a lot of stuff written
+about Hooks online, but for this app, we are going to only use the two most
 common hooks: `useState` and `useEffect`. Let's talk through what is happening
 on line 15 to gain an understanding of `useState`:
 
@@ -55,7 +56,7 @@ const [currentWeather, setCurrentWeather] = useState({
 });
 ```
 
-We create a new state variable `currentWeather` and a companion function
+We create a new state variable `currentWeather` and a companion "updater" function
 `setWeather` which allows us to modify `currentWeather` in a way that propagates
 throughout the app. The initial value of `currentWeather` is set by the input to
 `useState`:
@@ -131,6 +132,7 @@ message.
 
 ```jsx
 async function getWeather() {
+  setLoading(true);
   try {
     const currentWeather = await fetchCurrentWeatherAsync();
 
@@ -179,23 +181,65 @@ Setting the state triggers a render. Looking again at line 50:
 
 We finally get our weather forecast.
 
-We've abstracted away most of the interaction with the brightsky api in our `api.js` file. We will be around for any questions afterwards, but it's worth highlighting one detail: system permissions. System permissions can be a bit lengthy to set up, but are essential. Using the `expo-permissions` module we eliminate the tedious setup.
+We've abstracted away most of the interaction with the BrightSky API in our `api.js` file. We will be around for any questions afterwards, but it's worth highlighting one detail: system permissions. System permissions can be a bit lengthy to set up, but are essential. Using the `expo-permissions` module, we eliminate the tedious setup.
 
-### Adding user interaction (button to refetch current weather)
+### User Interaction
 
-Source: [https://snack.expo.io/@fiberjw/296fce](https://snack.expo.io/@fiberjw/296fce)
+Source: https://snack.expo.io/@fiberjw/brightsky-pt.-2
 
-Adding our first bit of user interactivity is easy using `TouchableOpacity`
+Let's create a custom button to refetch the current weather!
 
-### Screens - creating a navigation config (tabs in stack)
-
-Source: [https://snack.expo.io/@jkhales/65c337](https://snack.expo.io/@jkhales/65c337)
-
-Just like most websites have multiple pages, Apps often make use of multiple different `screens`. Let's refactor our app to see how to do this.
-
-Our first screen will be what we have worked on so far, and our second will be this simple stub:
+In our `StyleSheet.create` call, add the following configuration to style our custom button:
 
 ```jsx
+// StyleSheet.create ...
+checkButtonContainer: {
+  backgroundColor: purple,
+  borderRadius: 8,
+  padding: 16,
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+checkButtonLabel: { color: 'white', fontSize: 16, fontWeight: '500' },
+```
+
+Below the `<Text>` element rendering the current weather summary, add this `TouchableOpacity`:
+
+```jsx
+<TouchableOpacity style={styles.checkButtonContainer} onPress={getWeather}>
+  <Text style={styles.checkButtonLabel}>Check current weather</Text>
+</TouchableOpacity>
+```
+
+This button re-runs the `getWeather()` function whenever it is pressed, so users can stay up to date with weather changes.
+
+### Adding Navigation to our App
+
+Source: https://snack.expo.io/@fiberjw/brightsky-pt.-3
+
+Just like most websites have multiple pages, Apps often make use of multiple different "screens". Let's refactor our app to see how to do this.
+
+Let's make a folder called `screens` with three files:
+
+```jsx
+// CurrentWeather.js
+// 1. copy everything from App.js
+// 2. change local imports from ./ to ../
+// 3. change "export default function App" to "export function CurrentWeather"
+```
+
+```jsx
+// DailyForecast.js
+import React from "react";
+import { Text } from "react-native";
+
+export function DailyForecast() {
+  return <Text>DailyForecast</Text>;
+}
+```
+
+```jsx
+// ForecastDetails.js
 import React from "react";
 import { Text } from "react-native";
 
@@ -204,26 +248,254 @@ export function ForecastDetails() {
 }
 ```
 
-We move both of them into a `screens` folder and stitch them together using the `react-navigation` module. Although you can't tell from the name, this is also produced by Expo and is 'standard' navigator, being used in over 70% of all react-navigation projects.
+In our `App.js` file, we can now replace it with a navigator config, powered by
+[React Navigation](https://reactnavigation.org/docs/en/4.x/getting-started.html), which will handle screen transitions and create navigation components (headers, tab bars, etc) for us.
 
-We stitch the screens together with `createBottomTabNavigator`
+```jsx
+// App.js
+import React from "react";
+import { createAppContainer } from "react-navigation";
+import {
+  createStackNavigator,
+  NavigationStackProp
+} from "react-navigation-stack";
+import {
+  createBottomTabNavigator,
+  NavigationTabProp
+} from "react-navigation-tabs";
+import dayjs from "dayjs";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-Not so bad!
-Let's add a bit more style to this by getting a header with `createStackNavigator`:
-[https://snack.expo.io/@fiberjw/brightsky-pt.-4](https://snack.expo.io/@fiberjw/brightsky-pt.-4)
-You are probably thinking, that's a decent amount of code for a header. But `createStackNavigator` allows us to do more, we will be using it later to `link` to different screens instead of using the somewhat constrained bottom navigator.
+import { CurrentWeather } from "./screens/CurrentWeather";
+import { DailyForecast } from "./screens/DailyForecast";
+import { ForecastDetails } from "./screens/ForecastDetails";
+import { purple, darkGray } from "./colors";
 
-### Linking to another screen
+const MainTabNavigator = createBottomTabNavigator(
+  {
+    CurrentWeather,
+    DailyForecast
+  },
+  {
+    initialRouteName: "CurrentWeather",
+    defaultNavigationOptions: ({ navigation }) => ({
+      tabBarIcon: ({ focused }) => {
+        const { routeName } = navigation.state;
 
-Source: [https://snack.expo.io/@fiberjw/14c60b](https://snack.expo.io/@fiberjw/14c60b)
+        let iconName;
+        const color = focused ? purple : darkGray;
+        if (routeName === "CurrentWeather") {
+          iconName = focused ? "star" : "star-outline";
+        } else if (routeName === "DailyForecast") {
+          iconName = focused ? "clock" : "clock-outline";
+        }
 
-Let's add a third screen, `DailyForecast`.
+        return (
+          <MaterialCommunityIcons name={iconName} color={color} size={24} />
+        );
+      }
+    }),
+    tabBarOptions: {
+      showLabel: false,
+      activeTintColor: purple,
+      inactiveTintColor: darkGray
+    }
+  }
+);
 
-DailyForecast is in basically a `FlatList` of `TouchableOpacity`. These are
+MainTabNavigator.navigationOptions = ({
+  navigation
+}: {
+  navigation: NavigationTabProp
+}) => {
+  const { routeName } = navigation.state.routes[navigation.state.index];
+
+  // You can do whatever you like here to pick the title based on the route name
+  let headerTitle;
+  if (routeName === "CurrentWeather") {
+    headerTitle = "Current Weather";
+  } else if (routeName === "DailyForecast") {
+    headerTitle = "Next Week's Forecast";
+  }
+
+  return {
+    headerTitle
+  };
+};
+
+const AppNavigator = createStackNavigator(
+  {
+    MainTabNavigator,
+    ForecastDetails: {
+      screen: ForecastDetails,
+      navigationOptions: ({
+        navigation
+      }: {
+        navigation: NavigationStackProp
+      }) => ({
+        // generate dynamic screen title based on screen's params
+        title: dayjs(
+          new Date((navigation.state.params || { time: 0 }).time * 1000)
+        ).format("MMMM D, YYYY")
+      })
+    }
+  },
+  {
+    initialRouteName: "MainTabNavigator",
+    defaultNavigationOptions: {
+      headerTitleStyle: {
+        color: purple
+      },
+      headerBackTitleStyle: {
+        color: purple
+      },
+      headerTintColor: purple
+    }
+  }
+);
+
+export default createAppContainer(AppNavigator);
+```
+
+### Rendering a List of Components
+
+Source: https://snack.expo.io/@fiberjw/brightsky-pt.-4
+
+In our `DailyForecast.js` file, copy and paste the following code:
+
+```jsx
+// DailyForecast.js
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  ActivityIndicator
+} from "react-native";
+import { fetchForecastAsync, getForecastEmoji } from "../api";
+import { black, purple } from "../colors";
+import dayjs from "dayjs";
+
+function ForecastItem({
+  time,
+  summary,
+  icon,
+  temperatureHigh,
+  temperatureLow,
+  navigation
+}) {
+  return (
+    <TouchableOpacity
+      onPress={() =>
+        navigation.navigate("ForecastDetails", {
+          time,
+          summary,
+          icon,
+          temperatureHigh,
+          temperatureLow
+        })
+      }
+    >
+      <View style={styles.weatherIconAndTempRow}>
+        <Text style={styles.weatherIcon}>{getForecastEmoji(icon)}</Text>
+        <View>
+          <Text style={styles.date}>
+            {dayjs(new Date(time * 1000)).format("MMMM D, YYYY")}
+          </Text>
+          <Text style={styles.summary}>{summary.substr(0, 20)}...</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+}
+
+export function DailyForecast({ navigation }) {
+  const [dailyForecast, setDailyForecast] = useState({
+    daily: {
+      summary: "",
+      icon: "clear-day",
+      data: []
+    }
+  });
+  const [loading, setLoading] = useState(true);
+
+  async function getForecast() {
+    setLoading(true);
+    try {
+      const dailyForecastResult = await fetchForecastAsync();
+
+      setLoading(false);
+      setDailyForecast(dailyForecastResult);
+    } catch (e) {
+      setLoading(false);
+    }
+  }
+
+  useEffect(function didMount() {
+    getForecast();
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      {loading ? (
+        <ActivityIndicator color={purple} size="large" />
+      ) : (
+        <FlatList
+          keyExtractor={item => `${item.time}`}
+          data={dailyForecast.daily.data}
+          renderItem={({ item }) => (
+            <ForecastItem navigation={navigation} {...item} />
+          )}
+          onRefresh={getForecast}
+          refreshing={loading}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+        />
+      )}
+      <StatusBar barStyle="dark-content" />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1
+  },
+  separator: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: black,
+    opacity: 0.4
+  },
+  weatherIcon: {
+    fontSize: 64,
+    marginRight: 16
+  },
+  weatherIconAndTempRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 24
+  },
+  date: {
+    fontSize: 20,
+    fontWeight: "600",
+    marginBottom: 16
+  },
+  summary: {
+    fontSize: 16
+  }
+});
+```
+
+`DailyForecast` is basically a `FlatList` of `TouchableOpacity`-wrapped components. These are
 handy components worth getting comfortable with. For example, you could hack
-together a instagram feed with them.
+together a Instagram feed with them.
 
-The `ForecastItem`(TouchableOpacity), has a display similar to what we did with the `CurrentWeather` screen. It also introduces us to `Linking:`
+The `ForecastItem` has a layout similar to what we did with
+the `CurrentWeather` screen. It also introduces us to
+[`navigation.navigate`](https://reactnavigation.org/docs/en/4.x/navigation-prop.html#navigate---link-to-other-screens)
+which React Navigation provides to us to navigate between different screens:
 
 ```jsx
 onPress={() =>
@@ -237,7 +509,10 @@ onPress={() =>
 }
 ```
 
-The flat list is basically a glorified for loop that optimizes your lists to prevent memory issues that actually using a for loop/ array map would cause:
+The first argument to `navigation.navigate` is the name of the screen that you want to navigate to. That screen name was configured in `App.js`'s `createStackNavigator` call.
+
+The second argument to `navigation.navigate` is a parameters object which allows you to pass data to the
+screen you want to navigate to.
 
 ```jsx
 <FlatList
@@ -250,8 +525,112 @@ The flat list is basically a glorified for loop that optimizes your lists to pre
 />
 ```
 
-## API Server
+`FlatList` is basically a smart `for` loop that optimizes your lists to prevent memory issues that actually using a for loop/array map would cause.
 
-The BrightSky API server code lives in
-[`./brightsky-api`](https://github.com/expo/BrightSky/tree/master/brightsky-api)
-and is deployed on [ZEIT Now](https://now.sh).
+### Rendering Data Passed in from Another Screen
+
+Source: https://snack.expo.io/@fiberjw/brightsky-pt.-5
+
+Let's add some code to our third screen, `ForecastDetails`:
+
+```jsx
+// ForecastDetails.js
+import React from "react";
+import { View, StatusBar, StyleSheet, Text } from "react-native";
+import dayjs from "dayjs";
+
+import { getForecastEmoji } from "../api";
+
+export function ForecastDetails({ navigation }) {
+  const time = navigation.getParam("time");
+  const summary = navigation.getParam("summary");
+  const icon = navigation.getParam("icon");
+  const temperatureHigh = navigation.getParam("temperatureHigh");
+  const temperatureLow = navigation.getParam("temperatureLow");
+
+  return (
+    <View style={styles.container}>
+      <View>
+        <View style={styles.weatherIconAndTempRow}>
+          <Text style={styles.weatherIcon}>{getForecastEmoji(icon)}</Text>
+          <View>
+            <Text style={[styles.temp, { marginBottom: 16 }]}>
+              High: {Math.round(temperatureHigh)}°F
+            </Text>
+            <Text style={styles.temp}>Low: {Math.round(temperatureLow)}°F</Text>
+          </View>
+        </View>
+        <Text style={styles.date}>
+          {dayjs(new Date(time * 1000)).format("MMMM D, YYYY")}
+        </Text>
+        <Text style={styles.summary}>{summary}</Text>
+      </View>
+      <StatusBar barStyle="dark-content" />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    padding: 24
+  },
+  weatherIcon: {
+    fontSize: 88,
+    marginRight: 24
+  },
+  temp: {
+    fontSize: 31.25,
+    fontWeight: "600"
+  },
+  weatherIconAndTempRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16
+  },
+  date: {
+    fontSize: 25,
+    fontWeight: "600",
+    marginBottom: 16
+  },
+  summary: {
+    fontSize: 20,
+    lineHeight: 25
+  }
+});
+```
+
+This code looks a lot simpler than our previous screens, as it doesn't have to
+do any hard things like send an API request or render a list of data-driven
+components.
+
+We get the values passed to this screen from `DailyForecast` using the
+`navigation.getParam(paramName: string)` function:
+
+```jsx
+const time = navigation.getParam("time");
+const summary = navigation.getParam("summary");
+const icon = navigation.getParam("icon");
+const temperatureHigh = navigation.getParam("temperatureHigh");
+const temperatureLow = navigation.getParam("temperatureLow");
+```
+
+Then, we render the data we get similarly to how we have been doing so before:
+
+```jsx
+<View>
+  <Text style={[styles.temp, { marginBottom: 16 }]}>
+    High: {Math.round(temperatureHigh)}°F
+  </Text>
+  <Text style={styles.temp}>Low: {Math.round(temperatureLow)}°F</Text>
+</View>
+```
+
+### Fin
+
+Now you have your first Expo application that fetches data from an API, uses
+local device permissions, renders a FlatList, and uses common navigation
+paradigms!
+
+Feel free click the 'save' button to the top right if you want to extend this project by adding more screens, changing the styles, or gutting out the content completely and replacing it with your own app idea. Thanks for coming!
